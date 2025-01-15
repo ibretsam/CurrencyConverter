@@ -2,6 +2,8 @@
 
 A modern iOS currency converter application built with SwiftUI that supports offline functionality, real-time updates, and animations.
 
+<img src="media/demo.gif" alt="Demo" title="Demo" height="560"/>
+
 ## Features
 
 - Real-time currency conversion
@@ -9,9 +11,6 @@ A modern iOS currency converter application built with SwiftUI that supports off
 - Custom animated numeric keypad
 - Search and filter currencies
 - Automatic network state handling
-- Dark mode support
-- Haptic feedback
-- Smooth animations
 
 ## Project Structure
 
@@ -56,6 +55,11 @@ CurrencyConverter/
    - [Open Exchange Rates](https://openexchangerates.org/signup)
    - [Exchange Rates API](https://exchangeratesapi.io/)
 
+> **Note**: You only need to choose one API provider. Set your preferred provider in `NetworkManager.swift` by modifying the `service` variable:
+> ```swift
+> public let service = ExchangeRatesService.ExchangeRatesAPI // or .OpenExchangeRatesAPI
+> ```
+
 2. Create `Configuration.plist` in the project root:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -74,13 +78,13 @@ CurrencyConverter/
 1. Clone the repository
 2. Open the project in Xcode
 3. Select your development team in project settings
-4. Build and run using Xcode's play button or ⌘ + R
+4. Setup API keys as described above
+5. Build and run using Xcode's play button or ⌘ + R
 
 ## Architecture
 
 - **MVVM Pattern**: Separation of concerns between Views, ViewModels, and Models
 - **Service Layer**: Handles API communication and data formatting
-- **Repository Pattern**: Manages data persistence and caching
 - **Observer Pattern**: Using Combine for reactive updates
 
 ## Error Handling

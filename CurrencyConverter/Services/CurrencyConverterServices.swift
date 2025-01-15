@@ -83,7 +83,7 @@ final class CurrencyConverterServices: CurrencyConverterServicing {
     /// - NetworkError.invalidData: Parse failure
     /// - NetworkError.expired: Cache expired
 	func fetchExchangeRates(completion: @escaping (Result<ExchangeRate, NetworkError>) -> Void) {
-		networkManager.getExchangeRates(for: .OpenExchangeRatesAPI) { result in
+		networkManager.getExchangeRates(for: networkManager.service) { result in
 			DispatchQueue.main.async {
 				completion(result)
 			}

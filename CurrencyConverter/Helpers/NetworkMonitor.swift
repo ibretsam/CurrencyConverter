@@ -14,13 +14,25 @@ import Network
 /// - offlineWithValidCache: No connection, using valid cached data
 /// - offlineWithExpiredCache: No connection, cached data expired
 /// - error: Error state with description
-enum NetworkState {
+enum NetworkState: Equatable {
 	case online
 	case offlineWithValidCache
 	case offlineWithExpiredCache
 	case error(String)
+	
+	static func == (lhs: NetworkState, rhs: NetworkState) -> Bool {
+		switch (lhs, rhs) {
+			case (.online, .online),
+				(.offlineWithValidCache, .offlineWithValidCache),
+				(.offlineWithExpiredCache, .offlineWithExpiredCache):
+				return true
+			case (.error(let lhsError), .error(let rhsError)):
+				return lhsError == rhsError
+			default:
+				return false
+		}
+	}
 }
-
 /// Monitors network connectivity changes
 ///
 /// # Features

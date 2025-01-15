@@ -10,72 +10,73 @@ import Foundation
 /// Models exchange rate data from multiple API services
 ///
 /// # Features
-/// - Codable implementation for API responses
-/// - Cache management with expiration
-/// - Multiple service endpoint support
-/// - Error handling for invalid currencies
+/// - Data model for exchange rates
+/// - Support for multiple currencies
+/// - Timestamp tracking
+/// - Manual initialization from API responses
 ///
 /// # Usage Example
 /// ```swift
-/// let rate = try JSONDecoder().decode(ExchangeRate.self, from: data)
-/// let cached = CachedExchangeRate(exchangeRate: rate)
+/// let rate = ExchangeRate(
+///     baseCurrency: .USD,
+///     exchangeRates: [.EUR: 0.85, .GBP: 0.73],
+///     timestamp: Int(Date().timeIntervalSince1970)
+/// )
 /// ```
-class ExchangeRate: Codable {
+class ExchangeRate {
 	let baseCurrency: Currency
 	let exchangeRates: [Currency: Double]
 	var timestamp: Int
-	let disclaimer: String
-	let license: String
 	
-	enum CodingKeys: String, CodingKey {
-		case baseCurrency = "base"
-		case exchangeRates = "rates"
-		case timestamp
-		case disclaimer
-		case license
+	init(baseCurrency: Currency, exchangeRates: [Currency: Double], timestamp: Int) {
+		self.baseCurrency = baseCurrency
+		self.exchangeRates = exchangeRates
+		self.timestamp = timestamp
 	}
 	
-	required init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		
-		// Decode base currency
-		let baseString = try container.decode(String.self, forKey: .baseCurrency)
-		guard let base = Currency(rawValue: baseString) else {
-			throw DataError.invalidCurrency
-		}
-		baseCurrency = base
-		
-		// Decode rates dictionary
-		let ratesDict = try container.decode([String: Double].self, forKey: .exchangeRates)
-		var rates: [Currency: Double] = [:]
-		
-		for (key, value) in ratesDict {
-			if let currency = Currency(rawValue: key) {
-				rates[currency] = value
-			}
-		}
-		
-		exchangeRates = rates
-		timestamp = try container.decode(Int.self, forKey: .timestamp)
-		disclaimer = try container.decode(String.self, forKey: .disclaimer)
-		license = try container.decode(String.self, forKey: .license)
-	}
-	
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(baseCurrency.rawValue, forKey: .baseCurrency)
-		
-		// Convert Currency keys to String keys for encoding
-		var stringRates: [String: Double] = [:]
-		for (key, value) in exchangeRates {
-			stringRates[key.rawValue] = value
-		}
-		try container.encode(stringRates, forKey: .exchangeRates)
-		
-		try container.encode(timestamp, forKey: .timestamp)
-		try container.encode(disclaimer, forKey: .disclaimer)
-		try container.encode(license, forKey: .license)
-	}
+//	enum CodingKeys: String, CodingKey {
+//		case baseCurrency = "base"
+//		case exchangeRates = "rates"
+//		case timestamp
+//	}
+//	
+//	required init(from decoder: Decoder) throws {
+//		let container = try decoder.container(keyedBy: CodingKeys.self)
+//		
+//		// Decode base currency
+//		let baseString = try container.decode(String.self, forKey: .baseCurrency)
+//		guard let base = Currency(rawValue: baseString) else {
+//			throw DataError.invalidCurrency
+//		}
+//		baseCurrency = base
+//		
+//		// Decode rates dictionary
+//		let ratesDict = try container.decode([String: Double].self, forKey: .exchangeRates)
+//		var rates: [Currency: Double] = [:]
+//		
+//		for (key, value) in ratesDict {
+//			if let currency = Currency(rawValue: key) {
+//				rates[currency] = value
+//			}
+//		}
+//		
+//		exchangeRates = rates
+//		timestamp = try container.decode(Int.self, forKey: .timestamp)
+//	}
+//	
+//	func encode(to encoder: Encoder) throws {
+//		var container = encoder.container(keyedBy: CodingKeys.self)
+//		try container.encode(baseCurrency.rawValue, forKey: .baseCurrency)
+//		
+//		// Convert Currency keys to String keys for encoding
+//		var stringRates: [String: Double] = [:]
+//		for (key, value) in exchangeRates {
+//			stringRates[key.rawValue] = value
+//		}
+//		try container.encode(stringRates, forKey: .exchangeRates)
+//		
+//		try container.encode(timestamp, forKey: .timestamp)
+//	}
 }
 
 /// Manages cached exchange rate data with expiration
@@ -84,7 +85,7 @@ class ExchangeRate: Codable {
 /// - Configurable cache duration
 /// - Expiration tracking
 /// - Codable for persistence
-struct CachedExchangeRate: Codable {
+struct CachedExchangeRate {
 	let exchangeRate: ExchangeRate
 	let expirationDate: Date
 	
@@ -125,9 +126,31 @@ enum ExchangeRatesService: String, CaseIterable {
 	var latestEndpointURL: String {
 		switch self {
 			case .ExchangeRatesAPI:
-				return "https://api.exchangeratesapi.io/latest?api_key=\(apiKey)"
+				return "https://api.exchangeratesapi.io/latest?access_key=\(apiKey)"
 			case .OpenExchangeRatesAPI:
 				return "https://openexchangerates.org/api/latest.json?app_id=\(apiKey)"
 		}
 	}
+}
+
+/// A model representing the response from Exchange Rates API.
+///
+/// This structure maps the JSON response received from the Exchange Rates API service.
+struct ExchangeRatesAPIResponse: Codable {
+	let success: Bool
+	let timestamp: Int
+	let base: String
+	let date: String
+	let rates: [String: Double]
+}
+
+/// A model representing the response from Open Exchange Rates API.
+///
+/// This structure maps the JSON response received from the Open Exchange Rates API service.
+struct OpenExchangeRatesAPIResponse: Codable {
+	let disclaimer: String
+	let license: String
+	let timestamp: Int
+	let base: String
+	let rates: [String: Double]
 }

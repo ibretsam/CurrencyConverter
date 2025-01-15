@@ -165,10 +165,11 @@ class CurrencyConverterViewModel: ObservableObject {
 		
 		// Only observe network state changes for error handling
 		networkMonitor.$isConnected
+			.receive(on: DispatchQueue.main)
 			.sink { [weak self] isConnected in
 				guard let self = self else { return }
 				if !isConnected {
-					if let cached = self.storage.getCachedExchangeRate() {
+					if self.storage.getCachedExchangeRate() != nil {
 						self.networkState = .offlineWithValidCache
 					} else {
 						self.networkState = .offlineWithExpiredCache
@@ -177,7 +178,8 @@ class CurrencyConverterViewModel: ObservableObject {
 					self.networkState = .online
 				}
 			}
-		.store(in: &cancellables)	}
+			.store(in: &cancellables)
+	}
 	
 	// MARK: - Private Methods
 	

@@ -18,22 +18,22 @@ import Foundation
 /// ```swift
 /// NetworkManager.shared.getExchangeRates(for: .OpenExchangeRatesAPI) { result in
 ///     switch result {
-///     case .success(let rates):
-///         // Handle exchange rates
+///     case .success(let exchangeRate):
+///         // Handle exchange rate object directly
 ///     case .failure(let error):
-///         // Handle error
+///         // Handle specific NetworkError cases
 ///     }
 /// }
 /// ```
 class NetworkManager {
 	static let shared = NetworkManager()
-	public let service = ExchangeRatesService.OpenExchangeRatesAPI
+	public let service = ExchangeRatesService.ExchangeRatesAPI
 	
 	private init() {}
 	
-	func getExchangeRates(for service: ExchangeRatesService, completed: @escaping (Result<ExchangeRate, NetworkError>) -> Void) {
+	func getExchangeRates(for service: ExchangeRatesService,
+						  completed: @escaping (Result<ExchangeRate, NetworkError>) -> Void) {
 		let endpointURL = service.latestEndpointURL
-		
 		guard let url = URL(string: endpointURL) else {
 			completed(.failure(.invalidURL))
 			return
@@ -46,36 +46,51 @@ class NetworkManager {
 		
 		let task = URLSession.shared.dataTask(with: request) { data, response, error in
 			if let error = error {
-				print("Network error: \(error.localizedDescription)")
-				completed(.failure(.noData))
+				completed(.failure(.networkError(error)))
 				return
 			}
-			
-			guard let response = response as? HTTPURLResponse else {
-				print("Invalid response type")
+			guard let httpResponse = response as? HTTPURLResponse,
+				  (200...299).contains(httpResponse.statusCode),
+				  let data = data else {
 				completed(.failure(.invalidResponse))
 				return
 			}
 			
-			print("Response status code: \(response.statusCode)")
-			
-			guard let data = data else {
-				print("No data received")
-				completed(.failure(.invalidData))
-				return
-			}
-			
 			do {
-				print("Fetched data from api")
-//				let str = String(data: data, encoding: .utf8)
-//				print("Raw response: \(str ?? "nil")")
-				
 				let decoder = JSONDecoder()
-				let exchangeRates = try decoder.decode(ExchangeRate.self, from: data)
-				exchangeRates.timestamp = Int(Date().timeIntervalSince1970)
-				completed(.success(exchangeRates))
+				print("fetched api data")
+				switch service {
+					case .ExchangeRatesAPI:
+						let apiResponse = try decoder.decode(ExchangeRatesAPIResponse.self, from: data)
+						print("ExchangeRatesAPIResponse")
+						let base = Currency(rawValue: apiResponse.base) ?? .EUR
+						var mappedRates: [Currency: Double] = [:]
+						for (key, value) in apiResponse.rates {
+							if let cur = Currency(rawValue: key) {
+								mappedRates[cur] = value
+							}
+						}
+						let exchangeRate = ExchangeRate(baseCurrency: base,
+														exchangeRates: mappedRates,
+														timestamp: Int(Date().timeIntervalSince1970))
+						completed(.success(exchangeRate))
+						
+					case .OpenExchangeRatesAPI:
+						let apiResponse = try decoder.decode(OpenExchangeRatesAPIResponse.self, from: data)
+						print("OpenExchangeRatesAPIResponse")
+						let base = Currency(rawValue: apiResponse.base) ?? .USD
+						var mappedRates: [Currency: Double] = [:]
+						for (key, value) in apiResponse.rates {
+							if let cur = Currency(rawValue: key) {
+								mappedRates[cur] = value
+							}
+						}
+						let exchangeRate = ExchangeRate(baseCurrency: base,
+														exchangeRates: mappedRates,
+														timestamp: Int(Date().timeIntervalSince1970))
+						completed(.success(exchangeRate))
+				}
 			} catch {
-				print("Decoding error: \(error)")
 				completed(.failure(.invalidData))
 			}
 		}

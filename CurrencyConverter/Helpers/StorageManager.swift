@@ -18,10 +18,11 @@ import Foundation
 /// ```swift
 /// let storage = StorageManager.shared
 /// // Save exchange rate
-/// storage.saveExchangeRate(rates)
+/// storage.saveExchangeRate(exchangeRate)
 /// // Get currency preferences
-/// if let (from, to) = storage.getCurrencyPreferences() {
-///     // Handle preferences
+/// if let preferences = storage.getCurrencyPreferences() {
+///     let fromCurrency = preferences.from
+///     let toCurrency = preferences.to
 /// }
 /// ```
 class StorageManager {
@@ -34,19 +35,48 @@ class StorageManager {
 	private init() {}
 	
 	func saveExchangeRate(_ exchangeRate: ExchangeRate) {
-		let cached = CachedExchangeRate(exchangeRate: exchangeRate)
-		if let encoded = try? JSONEncoder().encode(cached) {
-			defaults.set(encoded, forKey: exchangeRateKey)
+		print("Saving exchange rate")
+		var dict: [String: Any] = [:]
+		dict["baseCurrency"] = exchangeRate.baseCurrency.rawValue
+		// Store as Int
+		dict["timestamp"] = exchangeRate.timestamp
+		
+		var ratesDict: [String: Double] = [:]
+		for (cur, val) in exchangeRate.exchangeRates {
+			ratesDict[cur.rawValue] = val
 		}
+		dict["exchangeRates"] = ratesDict
+		
+		let expirationDate = Date().addingTimeInterval(24 * 3600)
+		dict["expirationTimestamp"] = expirationDate.timeIntervalSince1970
+		
+		defaults.set(dict, forKey: exchangeRateKey)
+		print("Exchange rate saved")
 	}
 	
 	func getCachedExchangeRate() -> ExchangeRate? {
-		guard let data = defaults.data(forKey: exchangeRateKey),
-			  let cached = try? JSONDecoder().decode(CachedExchangeRate.self, from: data),
-			  cached.isValid else {
+		print("Getting cached exchange rate")
+		guard let dict = defaults.dictionary(forKey: exchangeRateKey),
+			  let baseStr = dict["baseCurrency"] as? String,
+			  let timestamp = dict["timestamp"] as? Int,
+			  let ratesDict = dict["exchangeRates"] as? [String: Double],
+			  let expirationTS = dict["expirationTimestamp"] as? TimeInterval
+		else {
 			return nil
 		}
-		return cached.exchangeRate
+		if Date().timeIntervalSince1970 > expirationTS {
+			return nil
+		}
+		let base = Currency(rawValue: baseStr) ?? .USD
+		var mappedRates: [Currency: Double] = [:]
+		for (curStr, val) in ratesDict {
+			if let c = Currency(rawValue: curStr) {
+				mappedRates[c] = val
+			}
+		}
+		
+		print("Exchange rate retrieved")
+		return ExchangeRate(baseCurrency: base, exchangeRates: mappedRates, timestamp: timestamp)
 	}
 	
 	func saveCurrencyPreferences(from: Currency, to: Currency) {
