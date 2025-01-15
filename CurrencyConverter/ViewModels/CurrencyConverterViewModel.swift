@@ -19,14 +19,7 @@ import Combine
 /// # Error Handling
 ///
 /// ## Network States
-/// ```swift
-/// enum NetworkState {
-///     case online               // Normal operation with internet
-///     case offlineWithValidCache    // No internet, using valid cached data
-///     case offlineWithExpiredCache  // No internet, cached data expired
-///     case error(String)        // Error state with message
-/// }
-/// ```
+/// See `Helpers\NetworkMonitor.NetworkState` for state definitions.
 ///
 /// ## Error Scenarios & Recovery
 ///

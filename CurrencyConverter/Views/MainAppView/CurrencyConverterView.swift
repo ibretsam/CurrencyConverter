@@ -7,24 +7,44 @@
 
 import SwiftUI
 
-///	 # CurrencyConverterView
+/// The main currency converter view providing user interface for currency conversion.
 ///
-///	 A SwiftUI view managing currency conversion operations, including:
-///	 - Observing a `CurrencyConverterViewModel` for exchange rate data and connectivity updates.
-///	 - Displaying an offline banner with a retry button when the network is offline.
-///	 - Handling an error state with a retry option and a user-friendly message.
-///	 - Providing UI components for currency selection, swapping currencies, and a custom numeric keypad.
-///	 - Adapting the view layout based on the network state (online, offline with cache, offline with expired cache, or error).
+/// # Overview
+/// Manages the complete currency conversion interface including:
+/// - Currency selection cards
+/// - Custom numeric keypad
+/// - Network state handling
+/// - Error management
 ///
-///	 Use this view to present a user interface for currency conversion tasks within your SwiftUI application.
+/// # Features
+/// - Real-time currency conversion
+/// - Offline mode with cached data
+/// - Currency swapping functionality
+/// - Custom numeric input
+/// - Error handling and recovery
+///
+/// # States
+/// - Online: Normal operation
+/// - Offline with valid cache: Limited operation
+/// - Offline with expired cache: Warning state
+/// - Error: Recovery options
+///
 struct CurrencyConverterView: View {
-	
+	/// View model managing currency conversion logic and network state
 	@StateObject var viewModel = CurrencyConverterViewModel()
+
+	/// State controlling the source currency picker sheet
 	@State private var showingFromPicker = false
+
+	/// State controlling the target currency picker sheet
 	@State private var showingToPicker = false
 	
-// MARK: - Offline Banner
-	
+    // MARK: - Offline Banner
+    
+    /// Displays a warning banner when operating in offline mode
+    /// - Shows network status
+    /// - Provides retry option
+    /// - Indicates cached data usage
 	private var offlineBanner: some View {
 		HStack {
 			Image(systemName: "wifi.slash")
@@ -37,8 +57,11 @@ struct CurrencyConverterView: View {
 		.background(Color(.systemYellow).opacity(0.2))
 	}
 	
-// MARK: - Error View
-	
+    // MARK: - Error View
+    
+    /// Displays error state with recovery options
+    /// - Parameter message: The error message to display
+    /// - Returns: A view containing error UI and retry button
 	private func errorView(message: String) -> some View {
 		VStack(spacing: 20) {
 			Image(systemName: "exclamationmark.triangle")
@@ -53,8 +76,13 @@ struct CurrencyConverterView: View {
 		.padding()
 	}
 	
-// MARK: - Main Content
-	
+    // MARK: - Main Content
+    
+    /// The primary content view containing currency cards and keypad
+    /// Features:
+    /// - Currency selection cards
+    /// - Currency swap button
+    /// - Custom numeric keypad
 	private var mainContent: some View {
 		VStack {
 			Spacer()
@@ -106,8 +134,14 @@ struct CurrencyConverterView: View {
 		}
 	}
 	
-// MARK: - Body
-	
+    // MARK: - Body
+    
+    /// Main view body implementing adaptive layout based on network state
+    /// Handles four states:
+    /// - Online operation
+    /// - Offline with valid cache
+    /// - Offline with expired cache
+    /// - Error state
 	var body: some View {
 		NavigationView {
 			ZStack {

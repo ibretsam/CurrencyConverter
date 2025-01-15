@@ -6,15 +6,45 @@
 //
 import SwiftUI
 
-/// A custom numeric keypad view that displays numeric buttons, a decimal separator, and a backspace.
-/// It allows input handling for numeric text and provides a long-press gesture on the backspace button
-/// to clear the input completely.
+/// A custom numeric keypad view for currency input handling.
 ///
-/// - Parameter amount: A binding to the text value representing the current numerical input.
+/// # Overview
+/// Provides a grid-based numeric keypad with:
+/// - Numeric buttons (0-9)
+/// - Decimal separator (,)
+/// - Backspace button with long-press clear functionality
+/// - Haptic feedback and animations
 ///
+/// # Features
+/// - Spring animations on button press
+/// - Haptic feedback for user interactions
+/// - Long-press to clear functionality
+/// - Automatic layout adaptation
+/// - Input validation and formatting
+///
+/// # Usage Example
+/// ```swift
+/// @State private var amount: String = ""
+///
+/// CustomKeypadView(amount: $amount)
+///     .frame(height: 360)
+/// ```
+///
+/// # Layout Structure
+/// ```
+/// ┌───────────────────────┐
+/// │  [ 1 ]  [ 2 ]  [ 3 ]  │
+/// │  [ 4 ]  [ 5 ]  [ 6 ]  │
+/// │  [ 7 ]  [ 8 ]  [ 9 ]  │
+/// │  [ , ]  [ 0 ]  [ ⌫ ]  │
+/// └───────────────────────┘
+/// ```
 struct CustomKeypadView: View {
+	/// Binding to the input amount string that will be modified by keypad input
 	@Binding var amount: String
 	
+	/// Grid layout configuration for the keypad buttons
+    /// Organized in a 4x3 grid with numbers, decimal, and backspace
 	private let buttons: [[String]] = [
 		["1", "2", "3"],
 		["4", "5", "6"],
@@ -22,12 +52,10 @@ struct CustomKeypadView: View {
 		[",", "0", "⌫"]
 	]
 	
-	/// The main content of the keypad view, featuring grid layout logic with adjustable spacing and
-	/// button sizing derived from the view's available width.
-	///
-	/// - Note: Uses `ForEach` to create rows of buttons, each of which triggers `handleInput(_:)`
-	///   or `clearInput()` when pressed or long-pressed.
-	///
+    // MARK: - Body Implementation
+    
+    /// The main content view implementing the keypad layout
+    /// Uses GeometryReader for responsive sizing and spacing
 	var body: some View {
 		GeometryReader { geometry in
 			let spacing: CGFloat = 10
@@ -71,12 +99,15 @@ struct CustomKeypadView: View {
 		.frame(height: 360)
 	}
 	
-	/// Handles user input from the keypad by appending numeric characters or a decimal separator, and
-	/// removing previous characters if the backspace button is pressed.
-	///
-	/// - Parameter button: The label of the pressed keypad button. It can be a numeric character,
-	///   a decimal symbol, or a backspace icon.
-	///
+    // MARK: - Private Methods
+    
+    /// Processes input from keypad buttons
+    /// - Parameter button: The pressed button's value
+    /// Handles:
+    /// - Numeric input (0-9)
+    /// - Decimal separator (,)
+    /// - Backspace (⌫)
+    /// - Input validation and formatting
 	private func handleInput(_ button: String) {
 		switch button {
 			case "⌫":
@@ -97,14 +128,23 @@ struct CustomKeypadView: View {
 		}
 	}
 	
-	/// Clears the entire input by setting `amount` to an empty string.
+    /// Clears the entire input amount
+    /// Triggered by long-pressing the backspace button
 	private func clearInput() {
 		amount = ""
 	}
 }
 
-/// A custom button style that applies a spring animation scale effect and haptic feedback when pressed.
-/// Increases the button’s size for visual emphasis and triggers a haptic response on presses.
+/// Custom button style for keypad buttons
+///
+/// # Features
+/// - Spring-based scale animation on press
+/// - Haptic feedback using UIImpactFeedbackGenerator
+/// - Visual feedback through size changes
+///
+/// # Animation Parameters
+/// - Scale: 1.0 -> 1.8 on press
+/// - Haptic feedback: Heavy impact style
 struct BouncyKeyStyle: ButtonStyle {
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label

@@ -6,6 +6,24 @@
 //
 import Foundation
 
+/// Manages persistent storage for exchange rates and preferences
+///
+/// # Features
+/// - Exchange rate caching
+/// - Currency preferences storage
+/// - JSON encoding/decoding
+/// - Cache validation
+///
+/// # Usage Example
+/// ```swift
+/// let storage = StorageManager.shared
+/// // Save exchange rate
+/// storage.saveExchangeRate(rates)
+/// // Get currency preferences
+/// if let (from, to) = storage.getCurrencyPreferences() {
+///     // Handle preferences
+/// }
+/// ```
 class StorageManager {
 	static let shared = StorageManager()
 	private let defaults = UserDefaults.standard

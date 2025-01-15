@@ -8,18 +8,21 @@ import SwiftUI
 
 /// A view that presents a searchable list of currencies for selection.
 ///
-/// This view displays a list of available currencies with their names and codes, allowing users to:
-/// - Search for specific currencies
-/// - Select a currency (except for the disabled currency)
-/// - View and update exchange rate data
+/// # Overview
+/// Provides a modal interface for currency selection with:
+/// - Searchable currency list
+/// - Real-time filtering
+/// - Exchange rate information
+/// - Update functionality
 ///
-/// The view includes:
-/// - A search bar for filtering currencies
-/// - A list showing currency names and codes
-/// - A footer displaying data provider information and last update time
-/// - Update functionality to refresh exchange rates
+/// # Features
+/// - Currency search and filtering
+/// - Disabled state for already selected currencies
+/// - Auto-scroll to selected currency
+/// - Update timestamp display
+/// - Network state handling
 ///
-/// # Example Usage:
+/// # Example Usage
 /// ```swift
 /// CurrencyPickerView(
 ///     selectedCurrency: $selectedCurrency,
@@ -27,23 +30,38 @@ import SwiftUI
 ///     viewModel: viewModel
 /// )
 /// ```
-///
-/// - Parameters:
-///   - selectedCurrency: A binding to the currently selected currency
-///   - disabledCurrency: A binding to the currency that should be disabled from selection
-///   - viewModel: The view model containing exchange rate data and fetch functionality
 struct CurrencyPickerView: View {
+	/// Dismissal action for the modal view
 	@Environment(\.dismiss) private var dismissAction
+
+	/// Currently selected currency
 	@Binding var selectedCurrency: Currency
+
+	/// Currency that should be disabled from selection
 	@Binding var disabledCurrency: Currency
+
+	/// Search text for filtering currencies
 	@State private var searchText = ""
+
+	/// State for tracking update progress
 	@State private var isUpdating = false
+
+	/// View model containing exchange rate data
 	@ObservedObject var viewModel: CurrencyConverterViewModel
+
+	/// Namespace for scroll animation
 	@Namespace private var scrollSpace
+
+	/// Currently scrolled currency ID
 	@State private var scrolledID: Currency?
+
+	/// Cached update time string
 	@State private var cachedUpdateTime: String = "Never"
+
+	/// Last update timestamp
 	@State private var lastTimestamp: Int?
 	
+	/// Formats the last update time in a human-readable format
 	var formattedUpdateTime: String {
 		guard let timestamp = viewModel.exchangeRate?.timestamp else { return "Never" }
 		let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
@@ -52,18 +70,17 @@ struct CurrencyPickerView: View {
 		return formatter.localizedString(for: date, relativeTo: Date())
 	}
 	
-	// MARK: - Footer View
-	
+    // MARK: - Footer View
+    
+    /// Displays data provider information and update controls
+    /// Layout:
+    /// ```
+    /// ┌──────────────────────────────────────────┐
+    /// │ Data provided by     Open Exchange Rates │
+    /// │ Updated 1 hour ago            Update Now │
+    /// └──────────────────────────────────────────┘
+    /// ```
 	var footerView: some View {
-	/// A view that displays the data provider and last update time. Looks like this:
-	//		┌──────────────────────────────────────────────────────────┐
-	//		│                                                          │
-	//		│  Data provided by               Open Exchange Rates API  │
-	//		│                                                          │
-	//		│  Updated 1 hour ago                          Update Now  │
-	//		│                                                          │
-	//		└──────────────────────────────────────────────────────────┘
-		
 		VStack {
 			HStack {
 				Text("Data provided by")
@@ -112,8 +129,10 @@ struct CurrencyPickerView: View {
 		)
 	}
 	
-	// MARK: - Filtered Currencies
-	
+    // MARK: - Filtered Currencies
+    
+    /// Returns filtered currency list based on search text
+    /// - Returns: Filtered array of Currency enum cases
 	var filteredCurrencies: [Currency] {
 		if searchText.isEmpty {
 			return Currency.allCases
@@ -124,8 +143,9 @@ struct CurrencyPickerView: View {
 		}
 	}
 	
-	// MARK: - Body
-	
+    // MARK: - Body Implementation
+    
+    /// Main view body with navigation and search functionality
 	var body: some View {
 		NavigationView {
 			ScrollViewReader { proxy in

@@ -8,31 +8,64 @@ import SwiftUI
 
 /// A view that displays a list of currencies and allows for currency selection
 ///
-/// This view presents a scrollable list of currencies where users can select a currency,
-/// with visual indicators for the currently selected and disabled currencies.
+/// # Overview
+/// Presents a scrollable list of currencies with:
+/// - Currency name and code display
+/// - Selection indicators
+/// - Disabled state handling
+/// - Programmatic scrolling support
 ///
-/// - Parameters:
-///   - filteredCurrencies: An array of `Currency` objects to display in the list
-///   - selectedCurrency: A binding to the currently selected currency
-///   - disabledCurrency: A binding to a currency that should be disabled in the list
-///   - convert: A closure to trigger conversion when a selection is made
-///   - dismissAction: An action to dismiss the view when a selection is made
-///   - scrolledID: A binding to track the currently scrolled currency for programmatic scrolling
+/// # Layout Structure
+/// ```
+/// ┌────────────────────────────────────────┐
+/// │ United States Dollar                 ✓ │
+/// │ USD                                    │
+/// ├────────────────────────────────────────┤
+/// │ Euro                                   │
+/// │ EUR                                    │
+/// ├────────────────────────────────────────┤
+/// │ British Pound Sterling                 │
+/// │ GBP                                    │
+/// └────────────────────────────────────────┘
+/// ```
 ///
-/// The view provides the following features:
-/// - Displays currency name and code
-/// - Shows a checkmark for the selected currency
-/// - Highlights selected currency in blue
-/// - Disables and dims the disabled currency
-/// - Supports programmatic scrolling through `scrolledID` binding
+/// # Usage Example
+/// ```swift
+/// CurrencyListView(
+///     filteredCurrencies: currencies,
+///     selectedCurrency: $selected,
+///     disabledCurrency: $disabled,
+///     convert: handleConversion,
+///     dismissAction: dismiss,
+///     scrolledID: $currentScroll
+/// )
+/// ```
 struct CurrencyListView: View {
+	/// Array of filtered currencies to display
 	let filteredCurrencies: [Currency]
+
+	/// Currently selected currency
 	@Binding var selectedCurrency: Currency
+
+	/// Currency that should be disabled from selection
 	@Binding var disabledCurrency: Currency
+
+	/// Callback to trigger currency conversion
 	let convert: () -> Void
+
+	/// Action to dismiss the currency picker
 	let dismissAction: DismissAction
+
+	/// ID of the currency to scroll to
 	@Binding var scrolledID: Currency?
 	
+	// MARK: - Body Implementation
+    
+    /// Main view body implementing the currency list
+    /// Features:
+    /// - Selectable currency rows
+    /// - Visual selection indicators
+    /// - Disabled state handling
 	var body: some View {
 		List(filteredCurrencies, id: \.self, selection: $scrolledID) { currency in
 			Button(action: {

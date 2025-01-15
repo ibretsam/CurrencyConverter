@@ -6,6 +6,25 @@
 //
 import Foundation
 
+/// Manages network requests for exchange rate data
+///
+/// # Features
+/// - Singleton pattern implementation
+/// - API request handling
+/// - Response validation and parsing
+/// - Error handling with NetworkError types
+///
+/// # Usage Example
+/// ```swift
+/// NetworkManager.shared.getExchangeRates(for: .OpenExchangeRatesAPI) { result in
+///     switch result {
+///     case .success(let rates):
+///         // Handle exchange rates
+///     case .failure(let error):
+///         // Handle error
+///     }
+/// }
+/// ```
 class NetworkManager {
 	static let shared = NetworkManager()
 	public let service = ExchangeRatesService.OpenExchangeRatesAPI

@@ -5,6 +5,20 @@
 //  Created by MasterBi on 11/01/2025.
 //
 
+/// Supported currencies with ISO 4217 codes
+///
+/// # Features
+/// - ISO currency codes
+/// - Localized currency names
+/// - Codable support
+/// - Case iteration
+///
+/// # Usage Example
+/// ```swift
+/// let usd = Currency.USD
+/// print(usd.name) // "United States Dollar"
+/// print(usd.rawValue) // "USD"
+/// ```
 enum Currency: String, CaseIterable, Decodable {
 	case AED = "AED"
 	case AFN = "AFN"
@@ -176,6 +190,10 @@ enum Currency: String, CaseIterable, Decodable {
 	case ZMW = "ZMW"
 	case ZWL = "ZWL"
 	
+    /// Provides localized currency names
+    ///
+    /// # Returns
+    /// Full currency name in English
 	var name: String {
 		switch self {
 				case .AED: return "United Arab Emirates Dirham"

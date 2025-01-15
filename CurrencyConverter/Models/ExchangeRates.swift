@@ -7,6 +7,19 @@
 
 import Foundation
 
+/// Models exchange rate data from multiple API services
+///
+/// # Features
+/// - Codable implementation for API responses
+/// - Cache management with expiration
+/// - Multiple service endpoint support
+/// - Error handling for invalid currencies
+///
+/// # Usage Example
+/// ```swift
+/// let rate = try JSONDecoder().decode(ExchangeRate.self, from: data)
+/// let cached = CachedExchangeRate(exchangeRate: rate)
+/// ```
 class ExchangeRate: Codable {
 	let baseCurrency: Currency
 	let exchangeRates: [Currency: Double]
@@ -65,6 +78,12 @@ class ExchangeRate: Codable {
 	}
 }
 
+/// Manages cached exchange rate data with expiration
+///
+/// # Features
+/// - Configurable cache duration
+/// - Expiration tracking
+/// - Codable for persistence
 struct CachedExchangeRate: Codable {
 	let exchangeRate: ExchangeRate
 	let expirationDate: Date
@@ -79,6 +98,13 @@ struct CachedExchangeRate: Codable {
 	}
 }
 
+/// Supported exchange rate API services
+///
+/// # Features
+/// - Multiple API support
+/// - Endpoint URL generation
+/// - Base currency configuration
+/// - API key management
 enum ExchangeRatesService: String, CaseIterable {
 	case ExchangeRatesAPI = "Exchange Rates API"
 	case OpenExchangeRatesAPI = "Open Exchange Rates API"

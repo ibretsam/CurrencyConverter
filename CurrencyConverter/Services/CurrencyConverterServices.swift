@@ -6,53 +6,82 @@
 //
 import Foundation
 
-/// A service responsible for handling currency conversion operations.
+/// Protocol defining currency conversion service operations
 ///
-/// This service provides functionality to fetch current exchange rates from external APIs.
+/// # Features
+/// - Asynchronous exchange rate fetching
+/// - Error handling with NetworkError
+/// - Completion-based API
 ///
-/// Example usage:
-/// ```
+/// # Usage Example
+/// ```swift
 /// let service = CurrencyConverterServices.shared
 /// service.fetchExchangeRates { result in
 ///     switch result {
 ///     case .success(let rates):
-///         // Handle the exchange rates
+///         // Handle exchange rates
 ///     case .failure(let error):
-///         // Handle the error
+///         // Handle error
 ///     }
 /// }
 /// ```
 protocol CurrencyConverterServicing {
-    /// Fetches current exchange rates from the server.
+    /// Fetches current exchange rates from the server
     ///
-    /// - Parameter completion: A closure that receives either the exchange rates or an error.
-    ///   The closure takes a single parameter of type `Result<ExchangeRate, NetworkError>`.
-    ///   - On success: Returns `ExchangeRate` containing current exchange rates.
-    ///   - On failure: Returns `NetworkError` describing what went wrong.
+    /// # Parameters
+    /// - completion: Result callback with ExchangeRate or NetworkError
+    ///
+    /// # Thread Safety
+    /// Completion handler is always called on the main thread
     func fetchExchangeRates(completion: @escaping (Result<ExchangeRate, NetworkError>) -> Void)
 }
 
-/// A concrete implementation of `CurrencyConverterServicing` that handles currency conversion operations.
+/// Implementation of CurrencyConverterServicing protocol
 ///
-/// This class follows the singleton pattern and interfaces with a `NetworkManager` to fetch exchange rates.
+/// # Features
+/// - Singleton pattern implementation
+/// - Thread-safe network operations
+/// - Automatic main thread completion
+///
+/// # Architecture
+/// ```
+/// ┌─────────────────────┐
+/// │ CurrencyConverter   │
+/// │     Services        │
+/// └─────────┬───────────┘
+///           │
+/// ┌─────────▼───────────┐
+/// │   NetworkManager    │
+/// └───────────────────┬─┘
+///                     │
+/// ┌───────────────────▼─┐
+/// │      API Layer      │
+/// └───────────────────┬─┘
+///                     │
+/// ┌───────────────────▼─┐
+/// │   Exchange Rates    │
+/// └─────────────────────┘
+/// ```
 final class CurrencyConverterServices: CurrencyConverterServicing {
-    /// The shared instance of `CurrencyConverterServices`.
+    /// Shared singleton instance
     static let shared = CurrencyConverterServices()
     
-    /// The network manager used for making API requests.
+    /// Network manager instance for API requests
     private let networkManager = NetworkManager.shared
     
-    /// Private initializer to enforce singleton pattern.
+    /// Private initializer for singleton pattern
     private init() {}
     
-    /// Fetches current exchange rates from OpenExchangeRates API.
+    /// Fetches exchange rates from API
     ///
-    /// This method makes an asynchronous network request and returns the result on the main thread.
+    /// # Threading
+    /// - Network calls run on background thread
+    /// - Completion always delivered on main thread
     ///
-    /// - Parameter completion: A closure that receives either the exchange rates or an error.
-    ///   The closure takes a single parameter of type `Result<ExchangeRate, NetworkError>`.
-    ///   - On success: Returns `ExchangeRate` containing current exchange rates.
-    ///   - On failure: Returns `NetworkError` describing what went wrong.
+    /// # Error Handling
+    /// - NetworkError.noInternet: No connection
+    /// - NetworkError.invalidData: Parse failure
+    /// - NetworkError.expired: Cache expired
 	func fetchExchangeRates(completion: @escaping (Result<ExchangeRate, NetworkError>) -> Void) {
 		networkManager.getExchangeRates(for: .OpenExchangeRatesAPI) { result in
 			DispatchQueue.main.async {
