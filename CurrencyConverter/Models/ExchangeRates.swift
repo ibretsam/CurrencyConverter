@@ -33,50 +33,6 @@ class ExchangeRate {
 		self.exchangeRates = exchangeRates
 		self.timestamp = timestamp
 	}
-	
-//	enum CodingKeys: String, CodingKey {
-//		case baseCurrency = "base"
-//		case exchangeRates = "rates"
-//		case timestamp
-//	}
-//	
-//	required init(from decoder: Decoder) throws {
-//		let container = try decoder.container(keyedBy: CodingKeys.self)
-//		
-//		// Decode base currency
-//		let baseString = try container.decode(String.self, forKey: .baseCurrency)
-//		guard let base = Currency(rawValue: baseString) else {
-//			throw DataError.invalidCurrency
-//		}
-//		baseCurrency = base
-//		
-//		// Decode rates dictionary
-//		let ratesDict = try container.decode([String: Double].self, forKey: .exchangeRates)
-//		var rates: [Currency: Double] = [:]
-//		
-//		for (key, value) in ratesDict {
-//			if let currency = Currency(rawValue: key) {
-//				rates[currency] = value
-//			}
-//		}
-//		
-//		exchangeRates = rates
-//		timestamp = try container.decode(Int.self, forKey: .timestamp)
-//	}
-//	
-//	func encode(to encoder: Encoder) throws {
-//		var container = encoder.container(keyedBy: CodingKeys.self)
-//		try container.encode(baseCurrency.rawValue, forKey: .baseCurrency)
-//		
-//		// Convert Currency keys to String keys for encoding
-//		var stringRates: [String: Double] = [:]
-//		for (key, value) in exchangeRates {
-//			stringRates[key.rawValue] = value
-//		}
-//		try container.encode(stringRates, forKey: .exchangeRates)
-//		
-//		try container.encode(timestamp, forKey: .timestamp)
-//	}
 }
 
 /// Manages cached exchange rate data with expiration
@@ -84,7 +40,6 @@ class ExchangeRate {
 /// # Features
 /// - Configurable cache duration
 /// - Expiration tracking
-/// - Codable for persistence
 struct CachedExchangeRate {
 	let exchangeRate: ExchangeRate
 	let expirationDate: Date

@@ -34,6 +34,18 @@ class StorageManager {
 	
 	private init() {}
 	
+	/// Saves the provided exchange rate information to UserDefaults.
+	/// - Parameter exchangeRate: The exchange rate object to be saved, containing base currency, timestamp, and exchange rates.
+	/// The data is stored as a dictionary with the following structure:
+	/// ```
+	/// [
+	///     "baseCurrency": String,
+	///     "timestamp": TimeInterval,
+	///     "exchangeRates": [String: Double],
+	///     "expirationTimestamp": TimeInterval
+	/// ]
+	/// ```
+	/// The exchange rate data is set to expire after 24 hours from the save time.
 	func saveExchangeRate(_ exchangeRate: ExchangeRate) {
 		print("Saving exchange rate")
 		var dict: [String: Any] = [:]
@@ -54,6 +66,16 @@ class StorageManager {
 		print("Exchange rate saved")
 	}
 	
+	/// Retrieves the cached exchange rate data from UserDefaults.
+	///
+	/// This method attempts to retrieve and reconstruct an `ExchangeRate` object from cached data.
+	/// The cached data includes the base currency, timestamp, exchange rates dictionary, and expiration timestamp.
+	///
+	/// - Returns: An `ExchangeRate` object if valid cached data exists and hasn't expired, otherwise `nil`.
+	///
+	/// The method will return `nil` in the following cases:
+	/// - Required data is missing or malformed in UserDefaults
+	/// - The cached data has expired (current time exceeds expiration timestamp)
 	func getCachedExchangeRate() -> ExchangeRate? {
 		print("Getting cached exchange rate")
 		guard let dict = defaults.dictionary(forKey: exchangeRateKey),
@@ -79,11 +101,18 @@ class StorageManager {
 		return ExchangeRate(baseCurrency: base, exchangeRates: mappedRates, timestamp: timestamp)
 	}
 	
+	/// Saves the user's preferred currency pair to persistent storage.
+	/// - Parameters:
+	///   - from: The base currency to convert from
+	///   - to: The target currency to convert to
 	func saveCurrencyPreferences(from: Currency, to: Currency) {
 		defaults.set(from.rawValue, forKey: fromCurrencyKey)
 		defaults.set(to.rawValue, forKey: toCurrencyKey)
 	}
 	
+	/// Retrieves the user's preferred currency conversion pair from UserDefaults.
+	/// - Returns: A tuple containing the source (`from`) and target (`to`) currencies if both values exist and are valid,
+	///           or `nil` if either currency preference is missing or invalid.
 	func getCurrencyPreferences() -> (from: Currency, to: Currency)? {
 		guard let fromString = defaults.string(forKey: fromCurrencyKey),
 			  let toString = defaults.string(forKey: toCurrencyKey),

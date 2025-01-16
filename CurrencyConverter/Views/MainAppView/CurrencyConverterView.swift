@@ -41,14 +41,14 @@ struct CurrencyConverterView: View {
 	
     // MARK: - Offline Banner
     
-    /// Displays a warning banner when operating in offline mode
+    /// Displays a warning banner when operating in offline mode with expired cache.
     /// - Shows network status
     /// - Provides retry option
     /// - Indicates cached data usage
 	private var offlineBanner: some View {
 		HStack {
 			Image(systemName: "wifi.slash")
-			Text("Offline Mode - Using Cached Data")
+			Text("Cached data expired, please connect to the internet to update")
 			Button("Retry") {
 				viewModel.fetchExchangeRates()
 			}
