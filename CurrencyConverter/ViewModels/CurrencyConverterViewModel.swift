@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-/// A view model that handles currency conversion operations and manages the state of the currency converter.
+/// ViewModel for handling currency conversion logic and state management.
 ///
 /// This class manages:
 /// - Currency conversion operations
@@ -66,7 +66,11 @@ class CurrencyConverterViewModel: ObservableObject {
 	/// The current exchange rate data containing all conversion rates
 	@Published var exchangeRate: ExchangeRate?
 	
-	/// Current error message to display, if any
+	/// Current error message to display, if any.
+	/// This is set when:
+	/// - There is a network error and no cached data is available.
+	/// - There is a failure in fetching exchange rates from the API.
+	/// - There is a data parsing error.
 	@Published var errorMessage: String?
 	
 	/// Source currency for conversion
@@ -121,14 +125,24 @@ class CurrencyConverterViewModel: ObservableObject {
 		}
 	}
 	
-	/// The converted amount in target currency
+	/// The converted amount in the target currency.
+	/// This value is calculated by taking the input amount in the source currency,
+	/// converting it to the base currency using the exchange rate for the source currency,
+	/// Formatted display version of the input amount.
+	/// This property is used to store the user input amount in a formatted manner.
+	/// It handles special cases such as decimal point input and leading zeros.
+	/// The formatted amount is updated whenever the `amount` property is set.
+	/// This ensures that the displayed amount is always in a user-friendly format.
+	/// If the input amount is zero or no exchange rates are available, the converted amount is set to zero.
 	@Published var convertedAmount: Double = 0
 	
 	/// Formatted display version of the input amount
-	@Published private(set) var formattedAmount: String = "0"
-	
-	// MARK: - Computed Properties
-	
+	/// Returns the converted amount formatted for display.
+	/// This property formats the `convertedAmount` for user-friendly display purposes.
+	/// It uses scientific notation for very large numbers (>=1 trillion) to ensure readability.
+	/// For smaller numbers, it uses a standard decimal format with two decimal places.
+	/// This ensures that the displayed amount is always in a consistent and easily readable format.
+	/// The formatted string is used in the UI to show the result of the currency conversion.
 	/// Returns the converted amount formatted for display
 	/// Uses scientific notation for very large numbers (>=1T)
 	/// Otherwise uses standard decimal format
@@ -148,10 +162,16 @@ class CurrencyConverterViewModel: ObservableObject {
 	
 	// MARK: - Initialization
 	
-	/// Initializes the view model and sets up:
-	/// - Currency preferences from storage
-	/// - Initial exchange rates
-	/// - Network state monitoring
+	/// Initializes the view model and sets up the initial state.
+	///
+	/// This includes:
+	/// - Loading currency preferences from storage or setting default values.
+	/// - Loading initial exchange rates from cache or network.
+	/// - Setting up network state monitoring to handle connectivity changes.
+	/// - Observing network state changes to update the UI and handle errors.
+	///
+	/// The initialization ensures that the view model is ready to handle currency conversion
+	/// operations and manage the state of the currency converter application.
 	init() {
 		if let preferences = storage.getCurrencyPreferences() {
 			self.fromCurrency = preferences.from
@@ -272,8 +292,12 @@ class CurrencyConverterViewModel: ObservableObject {
 		}
 	}
 	
-	/// Swaps the source and target currencies
-	/// Updates the conversion automatically
+	/// Swaps the source and target currencies.
+	///
+	/// This method exchanges the values of `fromCurrency` and `toCurrency`.
+	/// It is useful when the user wants to quickly reverse the direction of the currency conversion.
+	/// After swapping the currencies, it automatically triggers the conversion process to update the converted amount.
+	/// The method ensures that the UI reflects the new conversion direction immediately.
 	func swapCurrencies() {
 		let temp = fromCurrency
 		fromCurrency = toCurrency
