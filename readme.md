@@ -4,6 +4,14 @@ A modern iOS currency converter application built with SwiftUI that supports off
 
 <img src="media/demo.gif" alt="Demo" title="Demo" height="560"/>
 
+## Screenshots
+
+<p align="center">
+  <img src="media/screenshot-lightmode.jpg" alt="Light Mode" title="Light Mode" height="400"/>
+  <img src="media/screenshot-darkmode.jpg" alt="Dark Mode" title="Dark Mode" height="400"/>
+  <img src="media/currency-selector.jpg" alt="Currency Selector" title="Currency Selector" height="400"/>
+</p>
+
 ## Features
 
 - Real-time currency conversion
@@ -79,7 +87,7 @@ CurrencyConverter/
 2. Open the project in Xcode
 3. Select your development team in project settings
 4. Setup API keys as described above
-5. Build and run using Xcode's play button or ⌘ + R
+5. Build and run using Xcode's play button or <kbd>⌘</kbd> + <kbd>R</kbd>
 
 ## Architecture
 
@@ -108,3 +116,7 @@ The app implements comprehensive error handling for:
 - Offline with valid cache: Limited operation
 - Offline with expired cache: Warning state
 - Error: Recovery options
+
+## Development Log
+
+For detailed insights into the development process, technical decisions, and implementation challenges, check out the [Development Log](development-log.md).
