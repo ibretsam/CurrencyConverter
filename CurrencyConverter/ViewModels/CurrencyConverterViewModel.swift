@@ -131,6 +131,13 @@ class CurrencyConverterViewModel: ObservableObject {
 	/// If the input amount is zero or no exchange rates are available, the converted amount is set to zero.
 	@Published var convertedAmount: Double = 0
 	
+	/// Formatted display version of the input amount.
+	/// This property is used to store the user input amount in a formatted manner.
+	/// It handles special cases such as decimal point input and leading zeros.
+	/// The formatted amount is updated whenever the `amount` property is set.
+	/// This ensures that the displayed amount is always in a user-friendly format.
+	@Published private(set) var formattedAmount: String = "0"
+	
 	/// Formatted display version of the converted amount.
 	/// Uses scientific notation for very large numbers (>=1T) to ensure readability.
 	/// For smaller numbers, uses standard decimal format with appropriate grouping.
