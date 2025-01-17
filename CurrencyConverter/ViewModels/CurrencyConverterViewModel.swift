@@ -19,7 +19,7 @@ import Combine
 /// # Error Handling
 ///
 /// ## Network States
-/// See `Helpers\NetworkMonitor.NetworkState` for state definitions.
+/// See `Helpers/NetworkMonitor.NetworkState` for state definitions.
 ///
 /// ## Error Scenarios & Recovery
 ///
@@ -126,26 +126,14 @@ class CurrencyConverterViewModel: ObservableObject {
 	}
 	
 	/// The converted amount in the target currency.
-	/// This value is calculated by taking the input amount in the source currency,
-	/// converting it to the base currency using the exchange rate for the source currency,
-	/// Formatted display version of the input amount.
-	/// This property is used to store the user input amount in a formatted manner.
-	/// It handles special cases such as decimal point input and leading zeros.
-	/// The formatted amount is updated whenever the `amount` property is set.
-	/// This ensures that the displayed amount is always in a user-friendly format.
+	/// This value is calculated by taking the input amount in the source currency
+	/// and converting it using the current exchange rates.
 	/// If the input amount is zero or no exchange rates are available, the converted amount is set to zero.
 	@Published var convertedAmount: Double = 0
 	
-	/// Formatted display version of the input amount
-	/// Returns the converted amount formatted for display.
-	/// This property formats the `convertedAmount` for user-friendly display purposes.
-	/// It uses scientific notation for very large numbers (>=1 trillion) to ensure readability.
-	/// For smaller numbers, it uses a standard decimal format with two decimal places.
-	/// This ensures that the displayed amount is always in a consistent and easily readable format.
-	/// The formatted string is used in the UI to show the result of the currency conversion.
-	/// Returns the converted amount formatted for display
-	/// Uses scientific notation for very large numbers (>=1T)
-	/// Otherwise uses standard decimal format
+	/// Formatted display version of the converted amount.
+	/// Uses scientific notation for very large numbers (>=1T) to ensure readability.
+	/// For smaller numbers, uses standard decimal format with appropriate grouping.
 	var formattedConvertedAmount: String {
 		if abs(convertedAmount) >= 1_000_000_000_000 {
 			return scientificFormatter.string(from: NSNumber(value: convertedAmount)) ?? String(format: "%.2f", convertedAmount)
