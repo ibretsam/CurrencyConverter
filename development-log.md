@@ -8,7 +8,7 @@ Next, I delved into the API documentation for ExchangeRatesAPI and Open Exchange
 
 #### Day 2: Setting Up the Project
 
-Day two was dedicated to setting up the project environment. I initialized the project in Xcode and designed a basic app interface using mock data. I also created an app icon leveraging [icon.kitchen](https://icon.kitchen) to generate a professional-looking icon quickly.
+On this day, I was busy, so I just set up the project. I initialized the project in Xcode and designed a basic app interface using mock data. I also created an app icon using [icon.kitchen](https://icon.kitchen) to generate a professional-looking icon quickly.
 
 #### Day 3: A Brief Pause
 
@@ -16,9 +16,9 @@ No work was done on this day due to other commitments.
 
 #### Day 4: Core Development Begins
 
-With a clear roadmap, I dived into implementing the core functionality on day four. The first major task was creating the `NetworkManager` class, which acts as the backbone for API interactions. To ensure robustness, I incorporated error handling using a custom `NetworkError` enum. This decision was driven by the need to handle various network scenarios gracefully.
+With a clear vision, I dived into implementing the core functionality on day four. The first major task was creating the `NetworkManager` class, which acts as the backbone for API interactions. To ensure robustness, I incorporated error handling using a custom `NetworkError` enum. This decision was driven by the need to handle various network scenarios gracefully.
 
-While working on caching, I designed the `StorageService` class to manage data storage using `UserDefaults`. I also prioritized user-centric design by enabling the app to remember currency preferences across sessions.
+While working on caching the exchange rate, I designed the `StorageService` class to manage data storage using `UserDefaults`. I also prioritized user-centric design by enabling the app by saving last chosen currency by user using the `StorageService` class I've just written.
 
 The `CurrencyConverterViewModel` was the next focus. This component became the central hub for managing app state. It includes functionality for:
 - Loading exchange rates from cache or fetching them from an API.
