@@ -1,8 +1,13 @@
 # Currency Converter iOS App
 
 A modern iOS currency converter application built with SwiftUI that supports offline functionality, real-time updates, and animations.
+<p align="center">
+  <img src="media/AppIcon.png" alt="App Icon" title="App Icon" width="120" height="120"/>
+</p>
 
+<p align="center">
 <img src="media/demo.gif" alt="Demo" title="Demo" height="560"/>
+</p>
 
 ## Screenshots
 
